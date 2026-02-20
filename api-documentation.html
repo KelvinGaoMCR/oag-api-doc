@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee API Documentation</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f4f6f9; color: #1a1d23; line-height: 1.6; }
+
+    .sidebar {
+      position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
+      background: #1a1d23; color: #c9cdd6; padding: 24px 0; overflow-y: auto; z-index: 100;
+    }
+    .sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid #2e3340; margin-bottom: 16px; }
+    .sidebar-logo h2 { font-size: 16px; color: #fff; font-weight: 700; }
+    .sidebar-logo span { font-size: 12px; color: #6b7280; }
+    .sidebar nav a {
+      display: block; padding: 8px 20px; font-size: 13px; color: #9ca3af;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .sidebar nav a:hover, .sidebar nav a.active { color: #fff; background: #2e3340; }
+    .sidebar nav .section-label {
+      padding: 12px 20px 4px; font-size: 10px; text-transform: uppercase;
+      letter-spacing: 1px; color: #4b5563; font-weight: 600;
+    }
+
+    .main { margin-left: 240px; padding: 48px; max-width: 960px; }
+
+    h1 { font-size: 28px; font-weight: 700; color: #111; margin-bottom: 8px; }
+    h2 { font-size: 20px; font-weight: 700; color: #111; margin: 40px 0 16px; padding-top: 8px; }
+    h3 { font-size: 15px; font-weight: 600; color: #374151; margin: 24px 0 10px; }
+    p { color: #4b5563; margin-bottom: 12px; font-size: 14px; }
+
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 4px;
+      font-size: 12px; font-weight: 700; font-family: monospace; margin-right: 8px;
+    }
+    .badge.post { background: #fef3c7; color: #92400e; }
+    .badge.get  { background: #d1fae5; color: #065f46; }
+
+    .endpoint-card {
+      background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+      margin-bottom: 28px; overflow: hidden;
+    }
+    .endpoint-header {
+      padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid #f3f4f6; background: #fafafa;
+    }
+    .endpoint-header .path {
+      font-family: monospace; font-size: 14px; font-weight: 600; color: #111;
+    }
+    .endpoint-header .description { font-size: 13px; color: #6b7280; margin-left: auto; }
+    .endpoint-body { padding: 20px; }
+
+    .auth-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #eff6ff; color: #1d4ed8; font-size: 12px;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 16px;
+    }
+    .auth-tag svg { width: 12px; height: 12px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+    th { text-align: left; padding: 8px 12px; background: #f9fafb; color: #374151; font-weight: 600; border-bottom: 2px solid #e5e7eb; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; color: #4b5563; vertical-align: top; }
+    td:first-child { font-family: monospace; color: #6d28d9; font-size: 12px; }
+    tr:last-child td { border-bottom: none; }
+
+    .type-tag { display: inline-block; background: #f3f4f6; color: #6b7280; font-size: 11px; padding: 1px 6px; border-radius: 3px; font-family: monospace; }
+
+    pre {
+      background: #1a1d23; color: #e2e8f0; padding: 16px 20px; border-radius: 8px;
+      font-size: 13px; overflow-x: auto; margin: 12px 0; line-height: 1.7;
+    }
+    .code-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 6px; font-weight: 600; }
+
+    .response-block { margin-top: 16px; }
+    .response-tab {
+      display: inline-block; padding: 5px 14px; font-size: 12px; border-radius: 5px;
+      font-weight: 600; margin-bottom: 8px;
+    }
+    .response-tab.s200 { background: #d1fae5; color: #065f46; }
+    .response-tab.s401 { background: #fef3c7; color: #92400e; }
+    .response-tab.s404 { background: #fee2e2; color: #991b1b; }
+
+    .info-box {
+      background: #eff6ff; border-left: 4px solid #3b82f6; border-radius: 0 6px 6px 0;
+      padding: 12px 16px; margin: 16px 0; font-size: 13px; color: #1e40af;
+    }
+
+    .base-url {
+      background: #1a1d23; color: #a78bfa; padding: 12px 20px; border-radius: 8px;
+      font-family: monospace; font-size: 14px; margin: 16px 0;
+    }
+
+    .divider { border: none; border-top: 1px solid #e5e7eb; margin: 40px 0; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <h2>Employee API</h2>
+    <span>v1.0</span>
+  </div>
+  <nav>
+    <div class="section-label">Getting Started</div>
+    <a href="#overview">Overview</a>
+    <a href="#authentication">Authentication</a>
+
+    <div class="section-label">Endpoints</div>
+    <a href="#login">Login</a>
+    <a href="#logout">Logout</a>
+    <a href="#list-employees">List Employees</a>
+    <a href="#get-employee">Get Employee</a>
+
+    <div class="section-label">Reference</div>
+    <a href="#employee-object">Employee Object</a>
+    <a href="#errors">Error Codes</a>
+  </nav>
+</div>
+
+<div class="main">
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <h1>Employee API</h1>
+    <p>This API provides access to employee (personnel) data. All endpoints are protected by token-based authentication using Laravel Sanctum, except for the login endpoint.</p>
+    <h3>Base URL</h3>
+    <div class="base-url">http://172.16.11.77:8012/api</div>
+
+    <h3>Content Type</h3>
+    <p>All requests and responses use <code>application/json</code>.</p>
+
+    <div class="info-box">
+      🔒 All endpoints except <strong>POST /login</strong> require a Bearer token in the <code>Authorization</code> header.
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- AUTHENTICATION -->
+  <section id="authentication">
+    <h2>Authentication</h2>
+    <p>This API uses <strong>Bearer Token</strong> authentication via Laravel Sanctum. After a successful login, include the returned token in all subsequent requests.</p>
+
+    <h3>Request Header</h3>
+    <pre>Authorization: Bearer &lt;your_token&gt;
+Accept: application/json</pre>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ENDPOINTS -->
+  <h2>Endpoints</h2>
+
+  <!-- LOGIN -->
+  <section id="login">
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="badge post">POST</span>
+        <span class="path">/api/login</span>
+        <span class="description">Authenticate and receive an access token</span>
+      </div>
+      <div class="endpoint-body">
+        <p>Authenticates the user with their credentials and returns a Bearer token to be used in subsequent requests.</p>
+
+        <h3>Request Body</h3>
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>email</td><td><span class="type-tag">string</span></td><td>✅ Yes</td><td>User's email address</td></tr>
+            <tr><td>password</td><td><span class="type-tag">string</span></td><td>✅ Yes</td><td>User's password</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-label">Request Example</div>
+        <pre>POST /api/login
+Content-Type: application/json
+
+{
+  "email": "admin@gmail.com",
+  "password": "password"
+}</pre>
+
+        <div class="response-block">
+          <div class="response-tab s200">200 OK</div>
+          <pre>{
+  "token": "1|abcdefghijklmnopqrstuvwxyz123456",
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "user@example.com"
+  }
+}</pre>
+        </div>
+
+        <div class="response-block">
+          <div class="response-tab s401">401 Unauthorized</div>
+          <pre>{
+  "message": "Invalid credentials"
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGOUT -->
+  <section id="logout">
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="badge post">POST</span>
+        <span class="path">/api/logout</span>
+        <span class="description">Revoke the current access token</span>
+      </div>
+      <div class="endpoint-body">
+        <span class="auth-tag">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Requires Authentication
+        </span>
+        <p>Invalidates the current Bearer token. The user must log in again to get a new token.</p>
+
+        <div class="code-label">Request Example</div>
+        <pre>POST /api/logout
+Authorization: Bearer &lt;your_token&gt;</pre>
+
+        <div class="response-block">
+          <div class="response-tab s200">200 OK</div>
+          <pre>{
+  "message": "Logged out successfully"
+}</pre>
+        </div>
+
+        <div class="response-block">
+          <div class="response-tab s401">401 Unauthorized</div>
+          <pre>{
+  "message": "Unauthenticated."
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIST EMPLOYEES -->
+  <section id="list-employees">
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="badge get">GET</span>
+        <span class="path">/api/personal</span>
+        <span class="description">List all employees (paginated)</span>
+      </div>
+      <div class="endpoint-body">
+        <span class="auth-tag">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Requires Authentication
+        </span>
+        <p>Returns a paginated list of all employees. Results are limited to <strong>15 records per page</strong>.</p>
+
+        <h3>Query Parameters</h3>
+        <table>
+          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>page</td><td><span class="type-tag">integer</span></td><td>❌ No</td><td>Page number (default: 1)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-label">Request Example</div>
+        <pre>GET /api/personal?page=1
+Authorization: Bearer &lt;your_token&gt;</pre>
+
+        <div class="response-block">
+          <div class="response-tab s200">200 OK</div>
+          <pre>{
+  "current_page": 1,
+  "data": [
+    {
+      "person_id": 1001,
+      "employee_type_id": 2,
+      "employee_type": "Permanent",
+      "employee_number": "EMP-0001",
+      "title": "Mr.",
+      "first_name": "Somchai",
+      "middle_names": null,
+      "last_name": "Rakdee",
+      "national_identifier": "1234567890123",
+      "employee_date": "2015-03-01",
+      "part": "Full-time",
+      "organization_id": 10,
+      "department_number": "D05",
+      "department_code": "FIN",
+      "department": "Finance",
+      "location_id": 3,
+      "provice": "Bangkok",
+      "job_id": 55,
+      "position": "Financial Analyst",
+      "grade_id": 7,
+      "position_level": "Senior",
+      "organization": "Head Office",
+      "sub_organization": "Budget Division"
+    }
+  ],
+  "first_page_url": "https://your-domain.com/api/personal?page=1",
+  "from": 1,
+  "last_page": 10,
+  "last_page_url": "https://your-domain.com/api/personal?page=10",
+  "next_page_url": "https://your-domain.com/api/personal?page=2",
+  "path": "https://your-domain.com/api/personal",
+  "per_page": 15,
+  "prev_page_url": null,
+  "to": 15,
+  "total": 150
+}</pre>
+        </div>
+
+        <div class="response-block">
+          <div class="response-tab s401">401 Unauthorized</div>
+          <pre>{
+  "message": "Unauthenticated."
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GET SINGLE EMPLOYEE -->
+  <section id="get-employee">
+    <div class="endpoint-card">
+      <div class="endpoint-header">
+        <span class="badge get">GET</span>
+        <span class="path">/api/personal/{id}</span>
+        <span class="description">Get a single employee by person_id</span>
+      </div>
+      <div class="endpoint-body">
+        <span class="auth-tag">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Requires Authentication
+        </span>
+        <p>Returns the full details for a single employee, looked up by their <code>person_id</code>.</p>
+
+        <h3>Path Parameters</h3>
+        <table>
+          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>id</td><td><span class="type-tag">integer</span></td><td>✅ Yes</td><td>The employee's <code>person_id</code></td></tr>
+          </tbody>
+        </table>
+
+        <div class="code-label">Request Example</div>
+        <pre>GET /api/personal/1001
+Authorization: Bearer &lt;your_token&gt;</pre>
+
+        <div class="response-block">
+          <div class="response-tab s200">200 OK</div>
+          <pre>{
+  "person_id": 1001,
+  "employee_type_id": 2,
+  "employee_type": "Permanent",
+  "employee_number": "EMP-0001",
+  "title": "Mr.",
+  "first_name": "Somchai",
+  "middle_names": null,
+  "last_name": "Rakdee",
+  "national_identifier": "1234567890123",
+  "employee_date": "2015-03-01",
+  "part": "Full-time",
+  "organization_id": 10,
+  "department_number": "D05",
+  "department_code": "FIN",
+  "department": "Finance",
+  "location_id": 3,
+  "provice": "Bangkok",
+  "job_id": 55,
+  "position": "Financial Analyst",
+  "grade_id": 7,
+  "position_level": "Senior",
+  "organization": "Head Office",
+  "sub_organization": "Budget Division"
+}</pre>
+        </div>
+
+        <div class="response-block">
+          <div class="response-tab s404">404 Not Found</div>
+          <pre>{
+  "message": "Employee not found"
+}</pre>
+        </div>
+
+        <div class="response-block">
+          <div class="response-tab s401">401 Unauthorized</div>
+          <pre>{
+  "message": "Unauthenticated."
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- EMPLOYEE OBJECT -->
+  <section id="employee-object">
+    <h2>Employee Object Reference</h2>
+    <p>All employee endpoints return the following fields:</p>
+    <table>
+      <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>person_id</td><td><span class="type-tag">integer</span></td><td>Unique identifier for the employee</td></tr>
+        <tr><td>employee_type_id</td><td><span class="type-tag">integer</span></td><td>Numeric ID representing the employee type</td></tr>
+        <tr><td>employee_type</td><td><span class="type-tag">string</span></td><td>Human-readable employee type (e.g. Permanent, Contract)</td></tr>
+        <tr><td>employee_number</td><td><span class="type-tag">string</span></td><td>Employee's unique HR number</td></tr>
+        <tr><td>title</td><td><span class="type-tag">string</span></td><td>Name title (e.g. Mr., Mrs., Dr.)</td></tr>
+        <tr><td>first_name</td><td><span class="type-tag">string</span></td><td>Employee's first name</td></tr>
+        <tr><td>middle_names</td><td><span class="type-tag">string | null</span></td><td>Employee's middle name(s), if any</td></tr>
+        <tr><td>last_name</td><td><span class="type-tag">string</span></td><td>Employee's last name</td></tr>
+        <tr><td>national_identifier</td><td><span class="type-tag">string</span></td><td>National ID card number</td></tr>
+        <tr><td>employee_date</td><td><span class="type-tag">date</span></td><td>Date of employment (YYYY-MM-DD)</td></tr>
+        <tr><td>part</td><td><span class="type-tag">string</span></td><td>Employment basis (e.g. Full-time, Part-time)</td></tr>
+        <tr><td>organization_id</td><td><span class="type-tag">integer</span></td><td>ID of the employee's organization</td></tr>
+        <tr><td>department_number</td><td><span class="type-tag">string</span></td><td>Department number</td></tr>
+        <tr><td>department_code</td><td><span class="type-tag">string</span></td><td>Short code for the department</td></tr>
+        <tr><td>department</td><td><span class="type-tag">string</span></td><td>Full department name</td></tr>
+        <tr><td>location_id</td><td><span class="type-tag">integer</span></td><td>ID of the employee's work location</td></tr>
+        <tr><td>provice</td><td><span class="type-tag">string</span></td><td>Province / city of the work location</td></tr>
+        <tr><td>job_id</td><td><span class="type-tag">integer</span></td><td>ID of the job classification</td></tr>
+        <tr><td>position</td><td><span class="type-tag">string</span></td><td>Job position title</td></tr>
+        <tr><td>grade_id</td><td><span class="type-tag">integer</span></td><td>ID of the salary/position grade</td></tr>
+        <tr><td>position_level</td><td><span class="type-tag">string</span></td><td>Seniority level (e.g. Junior, Senior, Manager)</td></tr>
+        <tr><td>organization</td><td><span class="type-tag">string</span></td><td>Name of the organization</td></tr>
+        <tr><td>sub_organization</td><td><span class="type-tag">string</span></td><td>Name of the sub-division or unit</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ERROR CODES -->
+  <section id="errors">
+    <h2>Error Codes</h2>
+    <table>
+      <thead><tr><th>Status Code</th><th>Meaning</th><th>Common Cause</th></tr></thead>
+      <tbody>
+        <tr><td>200</td><td>OK</td><td>Request succeeded</td></tr>
+        <tr><td>401</td><td>Unauthorized</td><td>Missing or invalid Bearer token; wrong credentials on login</td></tr>
+        <tr><td>404</td><td>Not Found</td><td>No employee found with the given <code>person_id</code></td></tr>
+        <tr><td>422</td><td>Unprocessable Entity</td><td>Validation failed (e.g. missing email or password on login)</td></tr>
+        <tr><td>500</td><td>Internal Server Error</td><td>Unexpected server-side error</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider" />
+  <p style="font-size:12px; color:#9ca3af; text-align:center; padding-bottom: 40px;">Employee API Documentation · Generated February 2026</p>
+
+</div>
+</body>
+</html>
