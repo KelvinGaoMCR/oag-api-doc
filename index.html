@@ -94,6 +94,12 @@
     }
 
     .divider { border: none; border-top: 1px solid #e5e7eb; margin: 40px 0; }
+
+    .field-group-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      font-weight: 700; color: #9ca3af; padding: 10px 12px 4px;
+      background: #f9fafb; border-bottom: 1px solid #f3f4f6;
+    }
   </style>
 </head>
 <body>
@@ -405,14 +411,14 @@ Authorization: Bearer &lt;your_token&gt;</pre>
       <div class="endpoint-header">
         <span class="badge get">GET</span>
         <span class="path">/api/oag-organization</span>
-        <span class="description">List all OAG organization units</span>
+        <span class="description">List all OAG organization hierarchy structures</span>
       </div>
       <div class="endpoint-body">
         <span class="auth-tag">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           Requires Authentication
         </span>
-        <p>Returns all OAG organization units from the Oracle HR view <code>OAGHR_ORGANIZATION_UNITS_V</code>.</p>
+        <p>Returns all OAG organization hierarchy structures, each representing a parent–child relationship between two organization units within a named structure.</p>
 
         <div class="code-label">Request Example</div>
         <pre>GET /api/oag-organization
@@ -424,19 +430,18 @@ Authorization: Bearer &lt;your_token&gt;</pre>
   "success": true,
   "data": [
     {
-      "organization_id": "0",
-      "name": "Setup Business Group",
-      "end_date": null,
-      "department_num": null,
-      "department_short": null,
-      "part": null,
-      "location_id": null,
-      "address_line_1": null,
-      "address_line_2": null,
-      "address_line_3": null,
-      "region_1": null,
-      "provice": null,
-      "postal_code": null
+      "organization_structure_id": "61",
+      "structure_name": "MCR ORG Hierarchy",
+      "organization_id_parent": "81",
+      "parent_name": "MCR_OU",
+      "parent_end_date": null,
+      "parent_department_num": null,
+      "parent_department_short": null,
+      "organization_id_child": "101",
+      "child_name": "MERCURY_OU",
+      "child_end_date": null,
+      "child_department_num": null,
+      "child_department_short": null
     }
   ]
 }</pre>
@@ -458,25 +463,25 @@ Authorization: Bearer &lt;your_token&gt;</pre>
       <div class="endpoint-header">
         <span class="badge get">GET</span>
         <span class="path">/api/oag-organization/{id}</span>
-        <span class="description">Get a single OAG organization by organization_id</span>
+        <span class="description">Get a single OAG organization structure by organization_structure_id</span>
       </div>
       <div class="endpoint-body">
         <span class="auth-tag">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
           Requires Authentication
         </span>
-        <p>Returns details for a single OAG organization unit, looked up by its <code>organization_id</code>.</p>
+        <p>Returns the details for a single OAG organization hierarchy structure, looked up by its <code>organization_structure_id</code>.</p>
 
         <h3>Path Parameters</h3>
         <table>
           <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td>id</td><td><span class="type-tag">string</span></td><td>✅ Yes</td><td>The organization's <code>organization_id</code></td></tr>
+            <tr><td>id</td><td><span class="type-tag">string</span></td><td>✅ Yes</td><td>The structure's <code>organization_structure_id</code></td></tr>
           </tbody>
         </table>
 
         <div class="code-label">Request Example</div>
-        <pre>GET /api/oag-organization/10
+        <pre>GET /api/oag-organization/61
 Authorization: Bearer &lt;your_token&gt;</pre>
 
         <div class="response-block">
@@ -484,19 +489,18 @@ Authorization: Bearer &lt;your_token&gt;</pre>
           <pre>{
   "success": true,
   "data": {
-    "organization_id": "10",
-    "name": "Finance Department",
-    "end_date": null,
-    "department_num": "D05",
-    "department_short": "FIN",
-    "part": "Full-time",
-    "location_id": "3",
-    "address_line_1": "123 Main St",
-    "address_line_2": null,
-    "address_line_3": null,
-    "region_1": "Central",
-    "provice": "Bangkok",
-    "postal_code": "10200"
+    "organization_structure_id": "61",
+    "structure_name": "MCR ORG Hierarchy",
+    "organization_id_parent": "81",
+    "parent_name": "MCR_OU",
+    "parent_end_date": null,
+    "parent_department_num": null,
+    "parent_department_short": null,
+    "organization_id_child": "101",
+    "child_name": "MERCURY_OU",
+    "child_end_date": null,
+    "child_department_num": null,
+    "child_department_short": null
   }
 }</pre>
         </div>
@@ -560,23 +564,37 @@ Authorization: Bearer &lt;your_token&gt;</pre>
   <!-- OAG ORGANIZATION OBJECT -->
   <section id="oag-organization-object">
     <h2>OAG Organization Object Reference</h2>
-    <p>All OAG organization endpoints return the following fields. Source table: <code>apps.OAGHR_ORGANIZATION_UNITS_V</code> (Oracle DB).</p>
+    <p>All OAG organization endpoints return the following fields. Each record represents a parent–child relationship within a named organization hierarchy structure.</p>
     <table>
       <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>organization_id</td><td><span class="type-tag">string</span></td><td>Unique identifier for the organization unit</td></tr>
-        <tr><td>name</td><td><span class="type-tag">string</span></td><td>Full name of the organization unit</td></tr>
-        <tr><td>end_date</td><td><span class="type-tag">date | null</span></td><td>Date the organization unit was deactivated, or null if still active</td></tr>
-        <tr><td>department_num</td><td><span class="type-tag">string | null</span></td><td>Department number</td></tr>
-        <tr><td>department_short</td><td><span class="type-tag">string | null</span></td><td>Short code / abbreviation for the department</td></tr>
-        <tr><td>part</td><td><span class="type-tag">string | null</span></td><td>Employment basis associated with the unit</td></tr>
-        <tr><td>location_id</td><td><span class="type-tag">string | null</span></td><td>ID of the physical location</td></tr>
-        <tr><td>address_line_1</td><td><span class="type-tag">string | null</span></td><td>Primary address line</td></tr>
-        <tr><td>address_line_2</td><td><span class="type-tag">string | null</span></td><td>Secondary address line</td></tr>
-        <tr><td>address_line_3</td><td><span class="type-tag">string | null</span></td><td>Tertiary address line</td></tr>
-        <tr><td>region_1</td><td><span class="type-tag">string | null</span></td><td>Region or district</td></tr>
-        <tr><td>provice</td><td><span class="type-tag">string | null</span></td><td>Province / city of the organization location</td></tr>
-        <tr><td>postal_code</td><td><span class="type-tag">string | null</span></td><td>Postal / ZIP code</td></tr>
+        <tr>
+          <td colspan="3" style="padding: 0;">
+            <div class="field-group-label">Structure</div>
+          </td>
+        </tr>
+        <tr><td>organization_structure_id</td><td><span class="type-tag">string</span></td><td>Unique identifier for the organization hierarchy structure record</td></tr>
+        <tr><td>structure_name</td><td><span class="type-tag">string</span></td><td>Name of the organization hierarchy (e.g. "MCR ORG Hierarchy")</td></tr>
+        <tr>
+          <td colspan="3" style="padding: 0;">
+            <div class="field-group-label">Parent Organization</div>
+          </td>
+        </tr>
+        <tr><td>organization_id_parent</td><td><span class="type-tag">string</span></td><td>ID of the parent organization unit</td></tr>
+        <tr><td>parent_name</td><td><span class="type-tag">string</span></td><td>Name of the parent organization unit</td></tr>
+        <tr><td>parent_end_date</td><td><span class="type-tag">date | null</span></td><td>Deactivation date of the parent unit, or null if still active</td></tr>
+        <tr><td>parent_department_num</td><td><span class="type-tag">string | null</span></td><td>Department number of the parent unit</td></tr>
+        <tr><td>parent_department_short</td><td><span class="type-tag">string | null</span></td><td>Short code / abbreviation for the parent department</td></tr>
+        <tr>
+          <td colspan="3" style="padding: 0;">
+            <div class="field-group-label">Child Organization</div>
+          </td>
+        </tr>
+        <tr><td>organization_id_child</td><td><span class="type-tag">string</span></td><td>ID of the child organization unit</td></tr>
+        <tr><td>child_name</td><td><span class="type-tag">string</span></td><td>Name of the child organization unit</td></tr>
+        <tr><td>child_end_date</td><td><span class="type-tag">date | null</span></td><td>Deactivation date of the child unit, or null if still active</td></tr>
+        <tr><td>child_department_num</td><td><span class="type-tag">string | null</span></td><td>Department number of the child unit</td></tr>
+        <tr><td>child_department_short</td><td><span class="type-tag">string | null</span></td><td>Short code / abbreviation for the child department</td></tr>
       </tbody>
     </table>
   </section>
@@ -599,7 +617,7 @@ Authorization: Bearer &lt;your_token&gt;</pre>
   </section>
 
   <hr class="divider" />
-  <p style="font-size:12px; color:#9ca3af; text-align:center; padding-bottom: 40px;">Employee API Documentation · Updated March 2026</p>
+  <p style="font-size:12px; color:#9ca3af; text-align:center; padding-bottom: 40px;">Employee API Documentation · Updated April 2026</p>
 
 </div>
 </body>
